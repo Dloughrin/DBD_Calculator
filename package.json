@@ -1,3 +1,14 @@
 {
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@vitejs/plugin-react": "^4.5.2",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.4"
+  },
+  "name": "dbd-calculator",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "vitest"
+  }
 }

@@ -27,28 +27,28 @@ const reader = require('xlsx');
 
 class Loader {
 	constructor() {
-		this.characterPath = './Data/characterData.txt';
-		this.userPath = './Data/userData.txt';
-		this.npcPath = './Data/npcData.txt';
-		this.techPath = './Data/techniqueData.txt';
-		this.stylePath = './Data/styleData.txt';
-		this.itemPath = './Data/itemData.txt';
-		this.inventoryPath = './Data/inventoryData.txt';
-		this.partyPath = './Data/partyData.txt';
+		this.characterPath = './assets/characterData.txt';
+		this.userPath = './assets/userData.txt';
+		this.npcPath = './assets/npcData.txt';
+		this.techPath = './assets/techniqueData.txt';
+		this.stylePath = './assets/styleData.txt';
+		this.itemPath = './assets/itemData.txt';
+		this.inventoryPath = './assets/inventoryData.txt';
+		this.partyPath = './assets/partyData.txt';
 
-		this.dataPath = './Data/dataSet.xlsx';
+		this.dataPath = './assets/dataSet.xlsx';
 	}
 
 	backUpData(userList,itemList,charList,npcList,partyList,techList,invList,dojoList) {
-		this.characterPath = './BackupData/characterData.txt';
-		this.userPath = './BackupData/userData.txt';
-		this.npcPath = './BackupData/npcData.txt';
-		this.techPath = './BackupData/techniqueData.txt';
-		this.stylePath = './BackupData/styleData.txt';
-		this.itemPath = './BackupData/itemData.txt';
-		this.inventoryPath = './BackupData/inventoryData.txt';
-		this.partyPath = './BackupData/partyData.txt';
-		this.dataPath = './BackupData/dataSet.xlsx';
+		this.characterPath = './assets/characterData.txt';
+		this.userPath = './assets/userData.txt';
+		this.npcPath = './assets/npcData.txt';
+		this.techPath = './assets/techniqueData.txt';
+		this.stylePath = './assets/styleData.txt';
+		this.itemPath = './assets/itemData.txt';
+		this.inventoryPath = './assets/inventoryData.txt';
+		this.partyPath = './assets/partyData.txt';
+		this.dataPath = './assets/dataSet.xlsx';
 
 		this.characterSaver(charList);
 		this.userSaver(userList);
@@ -61,15 +61,15 @@ class Loader {
 		this.dojoSaver(dojoList);
 
 
-		this.characterPath = './Data/characterData.txt';
-		this.userPath = './Data/userData.txt';
-		this.npcPath = './Data/npcData.txt';
-		this.techPath = './Data/techniqueData.txt';
-		this.stylePath = './Data/styleData.txt';
-		this.itemPath = './Data/itemData.txt';
-		this.inventoryPath = './Data/inventoryData.txt';
-		this.partyPath = './Data/partyData.txt';
-		this.dataPath = './Data/dataSet.xlsx';
+		this.characterPath = './assets/characterData.txt';
+		this.userPath = './assets/userData.txt';
+		this.npcPath = './assets/npcData.txt';
+		this.techPath = './assets/techniqueData.txt';
+		this.stylePath = './assets/styleData.txt';
+		this.itemPath = './assets/itemData.txt';
+		this.inventoryPath = './assets/inventoryData.txt';
+		this.partyPath = './assets/partyData.txt';
+		this.dataPath = './assets/dataSet.xlsx';
 	}
 
 ///////////////////////////

@@ -3,10 +3,135 @@ import fs from 'fs/promises';
 import path from 'path';
 import { exec } from 'child_process';
 import { fileURLToPath } from 'url';
+import { AttributeBonus } from './attributeBonus.js';
+import { Attributes } from './attributes.js';
+import { Races } from './races.js';
+import { Character } from './character.js';
+import { Loader } from './loader.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const types = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css' };
+
+function createWeapon(name, bonuses) {
+  const ab = new AttributeBonus(name, 'Weapon');
+  Object.assign(ab, bonuses);
+  return { name, attbonus: ab };
+}
+
+function createArmor(name, bonuses) {
+  const ab = new AttributeBonus(name, 'Dogi');
+  Object.assign(ab, bonuses);
+  return { name, attbonus: ab };
+}
+
+const presetWeapons = {
+  Katana: createWeapon('Katana', {
+    bdex: 0.09, physicalAttack: 0.07, critRate: 0.07, speed: 0.03
+  }),
+  Greatsword: createWeapon('Greatsword', {
+    bstr: 0.1, physicalAttack: 0.09, critDamage: 0.07, blockRate: 0.03
+  }),
+  Gun: createWeapon('Gun', {
+    bfoc: 0.09, energyAttack: 0.08, hit: 0.05, critRate: 0.05
+  }),
+  Polearm: createWeapon('Polearm', {
+    bdex: 0.08, bfoc: 0.05, physicalAttack: 0.07, critRate: 0.04
+  }),
+  Staff: createWeapon('Staff', {
+    bsol: 0.09, energyAttack: 0.09, bdex: 0.03, critRate: 0.03
+  }),
+  Rod: createWeapon('Rod', {
+    bsol: 0.09, bfoc: 0.05, energyAttack: 0.08, critRate: 0.03
+  }),
+  Focus: createWeapon('Focus', {
+    bfoc: 0.09, magicPower: 0.08, critRate: 0.04
+  }),
+  Gloves: createWeapon('Gloves', {
+    bdex: 0.08, bfoc: 0.07, critRate: 0.07, dodge: 0.06
+  })
+};
+
+const presetArmors = {
+  Dogi: createArmor('Dogi', { bcon: 0.09, dodge: 0.03, pDefense: 0.05 }),
+  Armor: createArmor('Armor', { bcon: 0.1, pDefense: 0.08, blockRate: 0.04 }),
+  Battle_Armor: createArmor('Battle_Armor', { bcon: 0.1, pDefense: 0.09, blockPower: 0.05 }),
+  Robes: createArmor('Robes', { beng: 0.09, eDefense: 0.07, chargeBonus: 0.04 }),
+  Clothing: createArmor('Clothing', { beng: 0.07, bcon: 0.05, dodge: 0.04 }),
+  Demon_Clothes: createArmor('Demon_Clothes', { bcon: 0.09, beng: 0.06, critDamage: 0.03 }),
+  Jacket: createArmor('Jacket', { bcon: 0.08, pDefense: 0.06, hit: 0.03 })
+};
+
+function createCharacterPreset(name, race, stats, weapon, armor, style) {
+  const r = new Races(race);
+  const a = new Attributes(stats.str, stats.dex, stats.con, stats.eng, stats.sol, stats.foc);
+  const char = new Character(name, r, a, 'Preset');
+  if (weapon) { char.weapon = presetWeapons[weapon]; }
+  if (armor) { char.dogi = presetArmors[armor]; char.armor = char.dogi; }
+  char.fightingStyle = new AttributeBonus(name + '_Style', 'Fighting Style');
+  Object.assign(char.fightingStyle, style);
+  char.stats = char.attributes;
+  char.style = char.fightingStyle;
+  return char;
+}
+
+const presetCharacters = [
+  createCharacterPreset('Bruiser', 'Saiyan',
+    { str:1500, con:1500, eng:750, dex:500, foc:500, sol:250 },
+    'Greatsword', 'Armor',
+    { bstr:0.5, bcon:0.5, physicalAttack:0.3, pDefense:0.3, blockPower:0.2, critRate:0.2 }),
+  createCharacterPreset('Striker', 'Half-Saiyan',
+    { str:1500, dex:1500, con:750, eng:500, sol:500, foc:250 },
+    'Katana', 'Dogi',
+    { bstr:0.5, bdex:0.5, physicalAttack:0.3, critRate:0.3, speed:0.2, dodge:0.2 }),
+  createCharacterPreset('Speedster', 'Android',
+    { dex:1500, foc:1500, str:750, eng:500, con:500, sol:250 },
+    'Gloves', 'Clothing',
+    { bdex:0.5, bfoc:0.5, speed:0.35, hit:0.25, dodge:0.25, critRate:0.15 }),
+  createCharacterPreset('Hybrid Attacker', 'Human',
+    { str:1500, sol:1500, dex:750, eng:500, con:500, foc:250 },
+    'Rod', 'Robes',
+    { bstr:0.5, bsol:0.5, physicalAttack:0.3, energyAttack:0.3, speed:0.2, critRate:0.2 }),
+  createCharacterPreset('Blaster', 'Alien',
+    { sol:1500, foc:1500, eng:750, dex:500, str:500, con:250 },
+    'Focus', 'Robes',
+    { bsol:0.5, bfoc:0.5, energyAttack:0.35, critRate:0.25, hit:0.25, dodge:0.15 }),
+  createCharacterPreset('Skirmisher', 'Arcosian',
+    { foc:1500, con:1500, dex:750, eng:500, str:500, sol:250 },
+    'Gun', 'Jacket',
+    { bfoc:0.5, bcon:0.5, hit:0.3, dodge:0.3, speed:0.2, critRate:0.2 }),
+  createCharacterPreset('Guardian', 'Namekian',
+    { con:1500, sol:1500, str:750, eng:500, dex:500, foc:250 },
+    'Polearm', 'Armor',
+    { bcon:0.5, bsol:0.5, pDefense:0.3, blockRate:0.3, blockPower:0.2, hit:0.2 }),
+  createCharacterPreset('Tank', 'Majin',
+    { con:1500, eng:1500, str:750, sol:500, dex:500, foc:250 },
+    'Greatsword', 'Battle_Armor',
+    { bcon:0.5, beng:0.5, pDefense:0.35, eDefense:0.35, blockPower:0.15, blockRate:0.15 }),
+  createCharacterPreset('Defender', 'Dragon_Clan',
+    { con:1500, dex:1500, str:750, eng:500, foc:500, sol:250 },
+    'Polearm', 'Armor',
+    { bcon:0.5, bdex:0.5, pDefense:0.3, dodge:0.25, blockRate:0.25, blockPower:0.2 })
+];
+
+const techniquePresets = {
+  Custom: { type: 'Ki', flatDamage: 120, scalePercent: 4.25, hits: 1, armorPen: 0, hitRate: 0, critRate: 0 },
+  Kamehameha: { type: 'Ki', flatDamage: 125, scalePercent: 4.5, hits: 1, armorPen: 0, hitRate: 0, critRate: 0 },
+  'Meteor Combination': { type: 'Strike', flatDamage: 90, scalePercent: 1, hits: 3, armorPen: 30, hitRate: 0, critRate: 0 }
+};
+
+let loadedCharacters = [];
+let loadedNPCs = [];
+let loadedTechniques = [];
+let loader = null;
+
+export function getCharacterPresets() {
+  return presetCharacters;
+}
+
+export function getTechniquePresets() {
+  return techniquePresets;
+}
 
 export function createServer() {
   return http.createServer(async (req, res) => {
@@ -24,31 +149,30 @@ export function createServer() {
 }
 
 export let server;
-if (typeof window === 'undefined') {
+if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
   server = createServer();
+  loader = new Loader();
 
-  if (process.env.NODE_ENV !== 'test') {
-    const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => {
-      const url = `http://localhost:${PORT}`;
-      console.log(`Calculator running at ${url}`);
-      const opener = process.platform === 'darwin' ? 'open'
-        : process.platform === 'win32' ? 'start'
-        : 'xdg-open';
-      exec(`${opener} ${url}`, err => {
-        if (err) {
-          console.log('Unable to open browser automatically');
-        }
-      });
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, () => {
+    const url = `http://localhost:${PORT}`;
+    console.log(`Calculator running at ${url}`);
+    const opener = process.platform === 'darwin' ? 'open'
+      : process.platform === 'win32' ? 'start'
+      : 'xdg-open';
+    exec(`${opener} ${url}`, err => {
+      if (err) {
+        console.log('Unable to open browser automatically');
+      }
     });
-  }
+  });
+  
 } else if (process.env.NODE_ENV !== 'test') {
   const { Attributes } = await import('./attributes.js');
   const { Technique } = await import('./technique.js');
   const { Character } = await import('./character.js');
   const { Races } = await import('./races.js');
   const { Battle } = await import('./battle.js');
-  const { AttributeBonus } = await import('./attributeBonus.js');
 
   const styleAttributes = [
     'bstr','bdex','bcon','beng','bsol','bfoc','hit','dodge','speed','critRate',
@@ -64,128 +188,170 @@ if (typeof window === 'undefined') {
     physicalAttack:'Phys Atk %', energyAttack:'Eng Atk %', chargeBonus:'Charge Bonus %'
   };
 
-  function createWeapon(name, bonuses) {
-    const ab = new AttributeBonus(name, 'Weapon');
-    Object.assign(ab, bonuses);
-    return { name, attbonus: ab };
-  }
-
-  function createArmor(name, bonuses) {
-    const ab = new AttributeBonus(name, 'Dogi');
-    Object.assign(ab, bonuses);
-    return { name, attbonus: ab };
-  }
-
-  const presetWeapons = {
-    Katana: createWeapon('Katana', {
-      bdex: 0.09, physicalAttack: 0.07, critRate: 0.07, speed: 0.03
-    }),
-    Greatsword: createWeapon('Greatsword', {
-      bstr: 0.1, physicalAttack: 0.09, critDamage: 0.07, blockRate: 0.03
-    }),
-    Gun: createWeapon('Gun', {
-      bfoc: 0.09, energyAttack: 0.08, hit: 0.05, critRate: 0.05
-    }),
-    Polearm: createWeapon('Polearm', {
-      bdex: 0.08, bfoc: 0.05, physicalAttack: 0.07, critRate: 0.04
-    }),
-    Staff: createWeapon('Staff', {
-      bsol: 0.09, energyAttack: 0.09, bdex: 0.03, critRate: 0.03
-    }),
-    Rod: createWeapon('Rod', {
-      bsol: 0.09, bfoc: 0.05, energyAttack: 0.08, critRate: 0.03
-    }),
-    Focus: createWeapon('Focus', {
-      bfoc: 0.09, magicPower: 0.08, critRate: 0.04
-    }),
-    Gloves: createWeapon('Gloves', {
-      bdex: 0.08, bfoc: 0.07, critRate: 0.07, dodge: 0.06
-    })
-  };
-
-  const presetArmors = {
-    Dogi: createArmor('Dogi', { bcon: 0.09, dodge: 0.03, pDefense: 0.05 }),
-    Armor: createArmor('Armor', { bcon: 0.1, pDefense: 0.08, blockRate: 0.04 }),
-    Battle_Armor: createArmor('Battle_Armor', { bcon: 0.1, pDefense: 0.09, blockPower: 0.05 }),
-    Robes: createArmor('Robes', { beng: 0.09, eDefense: 0.07, chargeBonus: 0.04 }),
-    Clothing: createArmor('Clothing', { beng: 0.07, bcon: 0.05, dodge: 0.04 }),
-    Demon_Clothes: createArmor('Demon_Clothes', { bcon: 0.09, beng: 0.06, critDamage: 0.03 }),
-    Jacket: createArmor('Jacket', { bcon: 0.08, pDefense: 0.06, hit: 0.03 })
-  };
-
-  const presetAttributes = {
-    Bruiser: {
-      race: 'Saiyan',
-      stats: { str:1500, con:1500, eng:750, dex:500, foc:500, sol:250 },
-      weapon: 'Greatsword', armor: 'Armor',
-      style: { bstr:0.5, bcon:0.5, physicalAttack:0.3,
-               pDefense:0.3, blockPower:0.2, critRate:0.2 }
-    },
-    Striker: {
-      race: 'Half-Saiyan',
-      stats: { str:1500, dex:1500, con:750, eng:500, sol:500, foc:250 },
-      weapon: 'Katana', armor: 'Dogi',
-      style: { bstr:0.5, bdex:0.5, physicalAttack:0.3,
-               critRate:0.3, speed:0.2, dodge:0.2 }
-    },
-    Speedster: {
-      race: 'Android',
-      stats: { dex:1500, foc:1500, str:750, eng:500, con:500, sol:250 },
-      weapon: 'Gloves', armor: 'Clothing',
-      style: { bdex:0.5, bfoc:0.5, speed:0.35,
-               hit:0.25, dodge:0.25, critRate:0.15 }
-    },
-    'Hybrid Attacker': {
-      race: 'Human',
-      stats: { str:1500, sol:1500, dex:750, eng:500, con:500, foc:250 },
-      weapon: 'Rod', armor: 'Robes',
-      style: { bstr:0.5, bsol:0.5, physicalAttack:0.3,
-               energyAttack:0.3, speed:0.2, critRate:0.2 }
-    },
-    Blaster: {
-      race: 'Alien',
-      stats: { sol:1500, foc:1500, eng:750, dex:500, str:500, con:250 },
-      weapon: 'Focus', armor: 'Robes',
-      style: { bsol:0.5, bfoc:0.5, energyAttack:0.35,
-               critRate:0.25, hit:0.25, dodge:0.15 }
-    },
-    Skirmisher: {
-      race: 'Arcosian',
-      stats: { foc:1500, con:1500, dex:750, eng:500, str:500, sol:250 },
-      weapon: 'Gun', armor: 'Jacket',
-      style: { bfoc:0.5, bcon:0.5, hit:0.3,
-               dodge:0.3, speed:0.2, critRate:0.2 }
-    },
-    Guardian: {
-      race: 'Namekian',
-      stats: { con:1500, sol:1500, str:750, eng:500, dex:500, foc:250 },
-      weapon: 'Polearm', armor: 'Armor',
-      style: { bcon:0.5, bsol:0.5, pDefense:0.3,
-               blockRate:0.3, blockPower:0.2, hit:0.2 }
-    },
-    Tank: {
-      race: 'Majin',
-      stats: { con:1500, eng:1500, str:750, sol:500, dex:500, foc:250 },
-      weapon: 'Greatsword', armor: 'Battle_Armor',
-      style: { bcon:0.5, beng:0.5, pDefense:0.35,
-               eDefense:0.35, blockPower:0.15, blockRate:0.15 }
-    },
-    Defender: {
-      race: 'Dragon_Clan',
-      stats: { con:1500, dex:1500, str:750, eng:500, foc:500, sol:250 },
-      weapon: 'Polearm', armor: 'Armor',
-      style: { bcon:0.5, bdex:0.5, pDefense:0.3,
-               dodge:0.25, blockRate:0.25, blockPower:0.2 }
-    }
-  };
-
-  const techniquePresets = {
-    Custom: { type: 'Ki', flatDamage: 120, scalePercent: 4.25, hits: 1, armorPen: 0, hitRate: 0, critRate: 0 },
-    Kamehameha: { type: 'Ki', flatDamage: 125, scalePercent: 4.5, hits: 1, armorPen: 0, hitRate: 0, critRate: 0 },
-    'Meteor Combination': { type: 'Strike', flatDamage: 90, scalePercent: 1, hits: 3, armorPen: 30, hitRate: 0, critRate: 0 }
-  };
-
   const raceList = ['Human','Saiyan','Half-Saiyan','Android','Majin','Namekian','Dragon_Clan','Arcosian','Alien'];
+
+  async function initializeData() {
+    try {
+      // Load data from files
+      loadedCharacters = await loader.loadCharacterData();
+      loadedNPCs = await loader.loadNPCData();
+      loadedTechniques = await loader.loadTechniqueData();
+
+      console.log(`Loaded ${loadedCharacters.length} characters`);
+      console.log(`Loaded ${loadedNPCs.length} NPCs`);
+      console.log(`Loaded ${loadedTechniques.length} techniques`);
+
+      // Update presets with loaded data
+      updateCharacterPresets();
+      updateTechniquePresets();
+      
+      // Repopulate UI elements
+      populatePresets();
+      populateTechniqueSelect();
+      
+    } catch (error) {
+      console.error('Error initializing data:', error);
+      console.log('Falling back to default presets');
+    }
+  }
+
+  function updateCharacterPresets() {
+    // Add loaded characters to presets
+    const allLoadedChars = [...loadedCharacters, ...loadedNPCs];
+    
+    allLoadedChars.forEach(char => {
+      // Convert character to preset format
+      const preset = {
+        name: char.name,
+        race: char.race,
+        stats: {
+          str: char.attributes.str,
+          dex: char.attributes.dex,
+          con: char.attributes.con,
+          eng: char.attributes.eng,
+          sol: char.attributes.sol,
+          foc: char.attributes.foc
+        },
+        weapon: char.weapon ? char.weapon.name : null,
+        armor: char.dogi ? char.dogi.name : null,
+        style: char.fightingStyle ? extractStyleBonuses(char.fightingStyle) : {},
+        level: char.level,
+        techniques: char.techniques
+      };
+      
+      presetCharacters.push(preset);
+    });
+  }
+
+  function updateTechniquePresets() {
+    // Sort techniques by type
+    const strikeTeches = loadedTechniques.filter(t => t.techType === 'Strike');
+    const kiTechs = loadedTechniques.filter(t => t.techType === 'Ki');
+    const transformTechs = loadedTechniques.filter(t => t.techType === 'Transform');
+    const buffTechs = loadedTechniques.filter(t => t.techType === 'Buff');
+    const debuffTechs = loadedTechniques.filter(t => t.techType === 'Debuff');
+
+    // Add techniques to presets by category
+    [...strikeTeches, ...kiTechs].forEach(tech => {
+      techniquePresets[tech.name] = {
+        type: tech.techType,
+        flatDamage: tech.flatDamage,
+        scalePercent: tech.scalePercent,
+        hits: tech.hits,
+        armorPen: tech.armorPen,
+        hitRate: tech.hitRate,
+        critRate: tech.critRate,
+        energyCost: tech.energyCost,
+        healthCost: tech.healthCost,
+        description: tech.description
+      };
+    });
+  }
+
+  function extractStyleBonuses(fightingStyle) {
+    const bonuses = {};
+    const bonusFields = [
+      'bstr', 'bdex', 'bcon', 'beng', 'bsol', 'bfoc',
+      'hit', 'dodge', 'speed', 'critRate', 'critDamage',
+      'blockRate', 'blockPower', 'pDefense', 'eDefense',
+      'physicalAttack', 'energyAttack', 'chargeBonus'
+    ];
+
+    bonusFields.forEach(field => {
+      if (fightingStyle[field] && fightingStyle[field] !== 0) {
+        bonuses[field] = fightingStyle[field];
+      }
+    });
+
+    return bonuses;
+  }
+  // Update the populatePresets function to handle loaded characters
+  function populatePresets() {
+    const keys = presetCharacters.map(p => p.name);
+    ['atk-preset','def-preset'].forEach(id => {
+      const select = document.getElementById(id);
+      // Clear existing options
+      select.innerHTML = '';
+      
+      const none = document.createElement('option');
+      none.value = '';
+      none.textContent = 'Custom';
+      select.appendChild(none);
+      
+      keys.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name.replace(/_/g, ' ');
+        select.appendChild(opt);
+      });
+    });
+    
+    // Set default selections
+    document.getElementById('atk-preset').value = 'Blaster';
+    document.getElementById('def-preset').value = 'Tank';
+  }
+
+// Update populateTechniqueSelect to include loaded techniques
+  function populateTechniqueSelect() {
+    const select = document.getElementById('tech-select-box');
+    select.innerHTML = ''; // Clear existing options
+    
+    // Group techniques by type
+    const techniquesByType = {
+      'Strike': [],
+      'Ki': [],
+      'Transform': [],
+      'Buff': [],
+      'Debuff': []
+    };
+
+    Object.keys(techniquePresets).forEach(name => {
+      const preset = techniquePresets[name];
+      const type = preset.type || 'Ki';
+      if (techniquesByType[type]) {
+        techniquesByType[type].push(name);
+      }
+    });
+
+    // Add options grouped by type
+    Object.keys(techniquesByType).forEach(type => {
+      if (techniquesByType[type].length > 0) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = type + ' Techniques';
+        
+        techniquesByType[type].forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name.replace(/_/g, ' ');
+          optgroup.appendChild(opt);
+        });
+        
+        select.appendChild(optgroup);
+      }
+    });
+    
+    select.value = 'Custom';
+  }
 
   function populateRaces() {
     ['atk-race','def-race'].forEach(id => {
@@ -197,36 +363,6 @@ if (typeof window === 'undefined') {
         select.appendChild(opt);
       });
     });
-  }
-
-  function populatePresets() {
-    const keys = Object.keys(presetAttributes);
-    ['atk-preset','def-preset'].forEach(id => {
-      const select = document.getElementById(id);
-      const none = document.createElement('option');
-      none.value = '';
-      none.textContent = 'Custom';
-      select.appendChild(none);
-      keys.forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        select.appendChild(opt);
-      });
-    });
-    document.getElementById('atk-preset').value = 'Blaster';
-    document.getElementById('def-preset').value = 'Tank';
-  }
-
-  function populateTechniqueSelect() {
-    const select = document.getElementById('tech-select-box');
-    Object.keys(techniquePresets).forEach(name => {
-      const opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      select.appendChild(opt);
-    });
-    select.value = 'Custom';
   }
 
   function applyTechniquePreset(name) {
@@ -451,27 +587,29 @@ if (typeof window === 'undefined') {
   }
 
   function applyPreset(prefix, name) {
-    const preset = presetAttributes[name];
+    const preset = presetCharacters.find(p => p.name === name);
     if (!preset) return;
     const stats = preset.stats;
     ['str','dex','con','eng','sol','foc'].forEach(stat => {
       document.getElementById(prefix + stat).value = stats[stat];
     });
     if (preset.race) {
-      document.getElementById(prefix + 'race').value = preset.race;
+      document.getElementById(prefix + 'race').value = preset.race.raceName;
     }
     if (preset.weapon) {
-      document.getElementById(prefix + 'weapon-select').value = preset.weapon;
+      document.getElementById(prefix + 'weapon-select').value = preset.weapon.name;
     }
     if (preset.armor) {
-      document.getElementById(prefix + 'armor-select').value = preset.armor;
+      document.getElementById(prefix + 'armor-select').value = preset.armor.name;
     }
     if (preset.style) {
       let i = 0;
       for (const [attr,val] of Object.entries(preset.style)) {
-        document.getElementById(`${prefix}style-attr${i}`).value = attr;
-        document.getElementById(`${prefix}style-val${i}`).value = Math.round(val*100);
-        i++;
+        if (typeof val === 'number' && val !== 0 && i < 6) {
+          document.getElementById(`${prefix}style-attr${i}`).value = attr;
+          document.getElementById(`${prefix}style-val${i}`).value = Math.round(val*100);
+          i++;
+        }
       }
       for (; i < 6; i++) {
         document.getElementById(`${prefix}style-attr${i}`).value = '';
@@ -643,6 +781,14 @@ if (typeof window === 'undefined') {
       `${format('Skill', techRes, techAvg, techAvg===maxD)}`;
   }
 
+  initializeData().then(() => {
+    initDefaults();
+    applyPreset('atk-', 'Blaster');
+    applyPreset('def-', 'Tank');
+    applyTechniquePreset('Custom');
+    runCalc();
+  });
+  
   createAttributeInputs(document.getElementById('attacker-attributes'), 'atk-');
   createAttributeInputs(document.getElementById('defender-attributes'), 'def-');
   createStyleInputs(document.getElementById('atk-style'), 'atk-');

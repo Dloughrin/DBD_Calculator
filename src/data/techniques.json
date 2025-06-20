@@ -1,0 +1,28 @@
+[
+  {
+    "UID": 1,
+    "name": "Angry_Hit",
+    "techType": "Strike",
+    "flatDamage": 225,
+    "scalePercent": 3.5,
+    "hits": 1,
+    "energyCost": 15,
+    "armorPen": 5,
+    "hitRate": 0,
+    "critRate": 0,
+    "description": "A powerful energy wave attack"
+  },
+  {
+    "UID": 2,
+    "name": "Infinity_Bullet",
+    "techType": "Ki",
+    "flatDamage": 20,
+    "scalePercent": 1.5,
+    "hits": 5,
+    "energyCost": 15,
+    "armorPen": 5,
+    "hitRate": 5,
+    "critRate": 5,
+    "description": "A powerful energy wave attack"
+  }
+]

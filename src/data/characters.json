@@ -1,0 +1,36 @@
+[
+  {
+    "Name": "Goku",
+    "Race": "Poke",
+    "STR": 2000,
+    "DEX": 1800,
+    "CON": 1900,
+    "ENG": 1200,
+    "SOL": 1500,
+    "FOC": 1000,
+    "EXP": 50000,
+    "Stat Points": 10,
+    "TP": 25,
+    "styleName": "Poking_Style",
+    "Technique 1": 1,
+    "Technique 2": 2,
+    "Image": ""
+  },
+  {
+    "Name": "Caulifla",
+    "Race": "Saiyan",
+    "STR": 2000,
+    "DEX": 1800,
+    "CON": 1900,
+    "ENG": 1200,
+    "SOL": 1500,
+    "FOC": 1000,
+    "EXP": 50000,
+    "Stat Points": 10,
+    "TP": 25,
+    "styleName": "Ruffian_Style",
+    "Technique 1": 1,
+    "Technique 2": 2,
+    "Image": ""
+  },
+]

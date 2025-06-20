@@ -1,15 +1,15 @@
-if (typeof window === 'undefined') {
-  const http = await import('http');
-  const fs = await import('fs/promises');
-  const path = await import('path');
-  const { exec } = await import('child_process');
-  const { fileURLToPath } = await import('url');
+import http from 'http';
+import fs from 'fs/promises';
+import path from 'path';
+import { exec } from 'child_process';
+import { fileURLToPath } from 'url';
 
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const types = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css' };
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const types = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css' };
 
-  const server = http.createServer(async (req, res) => {
+export function createServer() {
+  return http.createServer(async (req, res) => {
     const file = req.url === '/' ? '/index.html' : req.url;
     const filePath = path.join(__dirname, file);
     try {
@@ -21,21 +21,28 @@ if (typeof window === 'undefined') {
       res.end('Not found');
     }
   });
+}
 
-  const PORT = process.env.PORT || 3000;
-  server.listen(PORT, () => {
-    const url = `http://localhost:${PORT}`;
-    console.log(`Calculator running at ${url}`);
-    const opener = process.platform === 'darwin' ? 'open'
-      : process.platform === 'win32' ? 'start'
-      : 'xdg-open';
-    exec(`${opener} ${url}`, err => {
-      if (err) {
-        console.log('Unable to open browser automatically');
-      }
+export let server;
+if (typeof window === 'undefined') {
+  server = createServer();
+
+  if (process.env.NODE_ENV !== 'test') {
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, () => {
+      const url = `http://localhost:${PORT}`;
+      console.log(`Calculator running at ${url}`);
+      const opener = process.platform === 'darwin' ? 'open'
+        : process.platform === 'win32' ? 'start'
+        : 'xdg-open';
+      exec(`${opener} ${url}`, err => {
+        if (err) {
+          console.log('Unable to open browser automatically');
+        }
+      });
     });
-  });
-} else {
+  }
+} else if (process.env.NODE_ENV !== 'test') {
   const { Attributes } = await import('./attributes.js');
   const { Technique } = await import('./technique.js');
   const { Character } = await import('./character.js');

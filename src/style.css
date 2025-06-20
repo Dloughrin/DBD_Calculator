@@ -1,0 +1,223 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f0f8ff;
+}
+.row {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+section {
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 1rem;
+    flex: 1 1 250px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+#attacker {
+    background: #ffeaea;
+}
+#defender {
+    background: #e9f1ff;
+}
+label {
+    display: inline-block;
+    width: 80px;
+}
+input {
+    width: 60px;
+    margin-bottom: .5rem;
+}
+select {
+    margin-bottom: .5rem;
+}
+button {
+    margin-top: 1rem;
+}
+#calc-btn {
+    width: 100%;
+}
+#hp-display {
+    margin: 1rem 0;
+    text-align: center;
+}
+#hp-bar {
+    width: 100%;
+    height: 20px;
+    border: 1px solid #000;
+    background: #ddd;
+    position: relative;
+}
+#hp-bar .bar-text {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    line-height: 20px;
+    pointer-events: none;
+}
+#hp-fill {
+    height: 100%;
+    background: #4caf50;
+    width: 100%;
+}
+.char-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+.char-top {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.char-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 2px solid #666;
+    border-radius: 4px;
+}
+
+.portrait {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.adv-stats {
+    border: 1px solid #888;
+    background: #fafafa;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    white-space: pre-line;
+}
+
+.img-adv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.charge {
+    width: 100%;
+    margin-top: auto;
+}
+
+.charge-bar {
+    width: 100%;
+    height: 12px;
+    background: #ddd;
+    border: 1px solid #2196f3;
+    margin-top: 4px;
+    position: relative;
+}
+
+.charge-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.charge-fill {
+    background: #2196f3;
+    height: 100%;
+    width: 0;
+}
+
+.charge-text {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 12px;
+    pointer-events: none;
+}
+
+.highlight {
+    background: #ffffcc;
+    font-weight: bold;
+    display: inline-block;
+    padding: 0.25rem;
+}
+
+#output {
+    background: #f5f5f5;
+    padding: 1rem;
+    white-space: pre-wrap;
+}
+
+.buffs {
+    white-space: pre-line;
+}
+
+.tech-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.technique div {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.technique label {
+    width: 130px;
+}
+
+.technique input[type="number"] {
+    width: 80px;
+}
+
+.tech-select label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.tech-select select {
+    width: 150px;
+    overflow-y: auto;
+}
+
+.style-row{
+    display:flex;
+    align-items:center;
+    gap:0.25rem;
+    font-size:0.8rem;
+    flex:1 1 calc(33% - 0.5rem);
+}
+.style-row label{width:100px;}
+.style-row input[type="number"]{width:60px;}
+.style{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.5rem;
+    margin-top:0.25rem;
+    justify-content:space-between;
+}
+
+.attr-row{display:flex;align-items:center;gap:0.25rem;font-size:0.8rem;}
+.buff-val{border:1px solid #888;background:#fafafa;padding:0 0.25rem;width:60px;text-align:right;}
+.style-box{border:1px solid #888;background:#fff;padding:0.5rem;margin-top:0.5rem;}
+.style-box label{
+    font-weight:bold;
+    display:block;
+    margin-bottom:0.25rem;
+    white-space:nowrap;
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technique Damage Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Technique Damage Calculator</h1>
+    <div class="row" id="top">
+        <section id="attacker">
+            <h2>Attacker</h2>
+            <div class="char-container">
+                <div class="char-top">
+                    <div class="stats">
+                    <div class="race">
+                            <label for="atk-race">Race</label>
+                            <select id="atk-race"></select>
+                        </div>
+                    <div class="preset">
+                            <label for="atk-preset">Preset</label>
+                            <select id="atk-preset"></select>
+                    </div>
+                        <div class="attributes" id="attacker-attributes"></div>
+                    <div class="random-buttons">
+                        <button id="atk-rand">Random</button>
+                        <button id="atk-rand-match">Random (match defender)</button>
+                    </div>
+                    <div class="weapon">
+                        <label for="atk-weapon-select">Weapon</label>
+                        <select id="atk-weapon-select">
+                            <option value="">None</option>
+                            <option value="Katana">Katana</option>
+                            <option value="Greatsword">Greatsword</option>
+                            <option value="Gun">Gun</option>
+                            <option value="Polearm">Polearm</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Rod">Rod</option>
+                            <option value="Focus">Focus</option>
+                            <option value="Gloves">Gloves</option>
+                        </select>
+                    </div>
+                    <div class="armor">
+                        <label for="atk-armor-select">Armor</label>
+                        <select id="atk-armor-select">
+                            <option value="">None</option>
+                            <option value="Dogi">Dogi</option>
+                            <option value="Armor">Armor</option>
+                            <option value="Battle_Armor">Battle Armor</option>
+                            <option value="Robes">Robes</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Demon_Clothes">Demon Clothes</option>
+                            <option value="Jacket">Jacket</option>
+                        </select>
+                    </div>
+                    </div>
+                    <div class="portrait">
+                        <div class="img-adv">
+                            <img id="atk-img" class="char-img" alt="attacker">
+                            <div id="atk-adv" class="adv-stats"></div>
+                        </div>
+                        <div id="atk-buffs" class="buffs"></div>
+                    </div>
+                </div>
+                <div class="style-box">
+                    <label>Fighting Style</label>
+                    <div id="atk-style" class="style"></div>
+                </div>
+                <div class="charge">
+                    <div class="charge-bar">
+                        <input type="range" id="atk-charge-input" class="charge-input" min="0" max="100" value="40">
+                        <div id="atk-charge-fill" class="charge-fill"></div>
+                        <div id="atk-charge-text" class="charge-text"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="defender">
+            <h2>Defender</h2>
+            <div class="char-container">
+                <div class="char-top">
+                    <div class="stats">
+                    <div class="race">
+                            <label for="def-race">Race</label>
+                            <select id="def-race"></select>
+                        </div>
+                    <div class="preset">
+                            <label for="def-preset">Preset</label>
+                            <select id="def-preset"></select>
+                    </div>
+                        <div class="attributes" id="defender-attributes"></div>
+                    <div class="random-buttons">
+                        <button id="def-rand">Random</button>
+                        <button id="def-rand-match">Random (match attacker)</button>
+                    </div>
+                    <div class="weapon">
+                        <label for="def-weapon-select">Weapon</label>
+                        <select id="def-weapon-select">
+                            <option value="">None</option>
+                            <option value="Katana">Katana</option>
+                            <option value="Greatsword">Greatsword</option>
+                            <option value="Gun">Gun</option>
+                            <option value="Polearm">Polearm</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Rod">Rod</option>
+                            <option value="Focus">Focus</option>
+                            <option value="Gloves">Gloves</option>
+                        </select>
+                    </div>
+                    <div class="armor">
+                        <label for="def-armor-select">Armor</label>
+                        <select id="def-armor-select">
+                            <option value="">None</option>
+                            <option value="Dogi">Dogi</option>
+                            <option value="Armor">Armor</option>
+                            <option value="Battle_Armor">Battle Armor</option>
+                            <option value="Robes">Robes</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Demon_Clothes">Demon Clothes</option>
+                            <option value="Jacket">Jacket</option>
+                        </select>
+                    </div>
+                    </div>
+                    <div class="portrait">
+                        <div class="img-adv">
+                            <img id="def-img" class="char-img" alt="defender">
+                            <div id="def-adv" class="adv-stats"></div>
+                        </div>
+                        <div id="def-buffs" class="buffs"></div>
+                    </div>
+                </div>
+                <div class="style-box">
+                    <label>Fighting Style</label>
+                    <div id="def-style" class="style"></div>
+                </div>
+                <div class="charge">
+                    <div class="charge-bar">
+                        <input type="range" id="def-charge-input" class="charge-input" min="0" max="100" value="40">
+                        <div id="def-charge-fill" class="charge-fill"></div>
+                        <div id="def-charge-text" class="charge-text"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div id="hp-display">
+        <button id="calc-btn">Calculate</button>
+        <div id="hp-bar">
+            <div id="hp-fill"></div>
+            <div id="hp-text" class="bar-text"></div>
+        </div>
+    </div>
+    <div class="row" id="bottom">
+        <section id="technique">
+            <h2>Technique</h2>
+            <div class="tech-wrap">
+                <div class="technique" id="technique-fields"></div>
+                <div class="tech-select">
+                    <label for="tech-select-box">Preset</label>
+                    <select id="tech-select-box" size="6"></select>
+                </div>
+            </div>
+        </section>
+        <section id="results">
+            <h2>Results</h2>
+            <pre id="output"></pre>
+        </section>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
